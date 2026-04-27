@@ -91,7 +91,20 @@ public class Practice {
    * @return a sorted list of all reachable vertex values
    */
   public static List<Integer> sortedReachable(Map<Integer, Set<Integer>> graph, int starting) {
-    return null;
+    List<Integer> sortedList = new ArrayList<>();
+    sortedReachable(graph, starting, new HashSet<>(), sortedList).sort(null);
+    return sortedList;
+  }
+
+  public static List<Integer> sortedReachable(Map<Integer, Set<Integer>> graph, int starting, Set<Integer> seen, List<Integer> sortedList){
+    if (seen.contains(starting) || !graph.containsKey(starting)) return sortedList;
+    seen.add(starting);
+    sortedList.add(starting);
+
+    for (int newNode : graph.get(starting)){ //this returns a list of int
+      sortedReachable(graph, newNode, seen, sortedList);
+    }
+    return sortedList;
   }
 
   /**
@@ -109,6 +122,20 @@ public class Practice {
    * @return true if there is a two-way connection between v1 and v2, false otherwise
    */
   public static <T> boolean twoWay(Vertex<T> v1, Vertex<T> v2) {
+    if (v1 == null || v2 == null) return false;
+    if (v1 == v2) return true;
+    return canReach(v1, v2, new HashSet<>()) && canReach(v2, v1, new HashSet<>());
+  }
+
+  public static <T> boolean canReach(Vertex<T> starting, Vertex<T> ending, Set<Vertex<T>> seen){
+    if (starting == ending) return true;
+    if (seen.contains(starting)) return false;
+    seen.add(starting);
+
+    for (Vertex<T> vertexNode : starting.neighbors){
+      if (canReach(vertexNode, ending, seen)) return true;
+    }
+
     return false;
   }
 
@@ -125,6 +152,22 @@ public class Practice {
    * @return whether there exists a valid positive path from starting to ending
    */
   public static boolean positivePathExists(Map<Integer, Set<Integer>> graph, int starting, int ending) {
+    if (starting == ending) return true;
+    if (!graph.containsKey(starting) || !graph.containsKey(ending)) return false;
+
+    return positivePathExists(graph, starting, ending, new HashSet<>());
+  }
+
+  public static boolean positivePathExists(Map<Integer, Set<Integer>> graph, int starting, int ending, Set<Integer> seen){
+    if (seen.contains(starting) || starting < 0) return false;
+    if (starting == ending) return true;
+    
+    seen.add(starting);
+
+    for (int newInt : graph.get(starting)){
+      if (positivePathExists(graph, newInt, ending, seen)) return true;
+    }
+
     return false;
   }
 
